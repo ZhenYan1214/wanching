@@ -223,8 +223,8 @@ const works = [
   // 組合1 - 貼文設計系列
   {
     id: 1,
-    title: '組合1｜貼文設計系列',
-    description: '一系列精心設計的社群媒體貼文，展現品牌故事與視覺美學的完美結合。',
+    title: 'Blush Bloom｜粉櫻綻放的氣色奇蹟',
+    description: '在淡櫻紛飛的柔光中，唇色輕輕綻放。結合獨家專利技術與日系美學調色，一抹粉嫩，宛如春日初吻。告別蠟黃與暗沉，以不紅腫、短修復期，打造專屬於你的櫻花好氣色。真實實拍，證明每一份粉嫩都是值得相信的改變。',
     category: '貼文設計',
     type: 'group',
     images: [
@@ -235,8 +235,8 @@ const works = [
   // 組合2 - 貼文設計系列
   {
     id: 2,
-    title: '組合2｜貼文設計系列',
-    description: '創意十足的視覺設計，透過色彩與構圖傳達品牌理念。',
+    title: 'Timeless Duality｜青春雙效 同步綻放',
+    description: '從細胞深處綻放青春，不僅是逆齡，更是重啟肌膚與身體的雙重能量。左瓶以柔霧粉包裹溫和美白力量，淨斑提亮，煥現透光肌；右瓶則以黑金格調承載高純度 NMN，於夜間修復、喚醒細胞生命力。一日雙軌，一內一外，輕鬆走進真正「由內而外」的青春迴圈。',
     category: '貼文設計',
     type: 'group',
     images: [
@@ -249,8 +249,8 @@ const works = [
   // 組合3 - 貼文設計系列
   {
     id: 3,
-    title: '組合3｜貼文設計系列',
-    description: '多元化的設計風格，從簡約到華麗，展現不同的視覺語言。',
+    title: 'Nude Radiance｜裸感光采的極簡奢養',
+    description: '一瓶，為每一次素顏準備的高級底氣。來自法國 Raffiné 的專業級防護精華，集防曬、潤色、緊緻於一身，無須多層堆疊，即刻展現裸肌自帶濾鏡的光澤感。',
     category: '貼文設計',
     type: 'group',
     images: [
@@ -266,8 +266,8 @@ const works = [
   // 組合4 - 貼文設計系列
   {
     id: 4,
-    title: '組合4｜貼文設計系列',
-    description: '精心策劃的視覺系列，每個元素都經過深思熟慮的設計。',
+    title: 'Bright Cell Rhythm｜由內而外的透白節奏',
+    description: '精心策劃的視覺系列，每個元素都經過深思熟慮的設計。每一顆膠囊，都是為青春定調的音符。專利亮白補充丸，17種美膚配方調和成溫柔而精準的透亮旋律，改善黯沉、均勻膚色，讓紅潤氣色悄悄綻放；',
     category: '貼文設計',
     type: 'group',
     images: [
@@ -282,8 +282,8 @@ const works = [
   // 組合5 - 貼文設計系列
   {
     id: 5,
-    title: '組合5｜貼文設計系列',
-    description: '獨特的設計理念，創造令人印象深刻的視覺體驗。',
+    title: 'Gentle Renewal｜六步極光修復療程',
+    description: '以第四代醫學級果酸科技為核心，LHA LALA 療程以溫和不傷膚的方式進行細緻更新。不僅改善肌膚紋理，更同步滋養肌底，讓你在每一次療程中，重新感受水潤、光澤、柔嫩的重生節奏。',
     category: '貼文設計',
     type: 'group',
     images: [
@@ -294,8 +294,8 @@ const works = [
   // 組合6 - 貼文設計系列
   {
     id: 6,
-    title: '組合6｜貼文設計系列',
-    description: '完整的設計系列，展現從概念到執行的完整設計流程。',
+    title: 'Luminance Precision｜精準透白的動能釋放',
+    description: '在醫美級美白進程中，真正改寫膚色命運的，不只是療程，而是成分的科學選擇。WHITENING MESO 精準導入傳明酸，以三重作用深入肌底',
     category: '貼文設計',
     type: 'group',
     images: [
@@ -308,8 +308,8 @@ const works = [
   // 組合7 - 療癒系設計系列
   {
     id: 7,
-    title: '療癒系設計系列',
-    description: '一系列溫暖療癒的視覺設計，從分心回聲到療癒時光，展現溫柔的設計力量。',
+    title: 'Silent Craft｜靜中有力的職人療癒',
+    description: '在一雙溫柔而堅定的手中，藏著職人的深厚底蘊。SUNG 松 ‧ 匠心手藝，從指尖緩緩傳遞溫度，深入疲憊與壓力的縫隙之間，',
     category: '貼文設計',
     type: 'group',
     images: [
@@ -320,8 +320,8 @@ const works = [
   // 組合12 - 數位焦慮系列
   {
     id: 12,
-    title: '數位焦慮系列',
-    description: '以溫柔幽默描繪現代人的數位焦慮，喚醒專注與連結的價值。',
+    title: 'Digital Drain｜當滑動成為大腦的慢性疲勞',
+    description: '不是你不夠努力，而是大腦正悄悄被手機掏空。過度滑手機帶來多巴胺刺激泛濫、專注力迴路退化與思緒破碎化，數位生活不是敵人，但我們需要更有意識的使用方式，讓科技為你所用，而非主宰你的專注力。',
     category: '貼文設計',
     type: 'group',
     images: [
@@ -332,8 +332,8 @@ const works = [
   // 組合8 - Pizza Time 系列
   {
     id: 8,
-    title: 'Pizza Time 系列',
-    description: '澳門人氣PIZZA品牌在香港的完整行銷系列，從母親節到開張慶典，展現品牌魅力。',
+    title: 'Slice of Love｜一口濃情，共享媽媽的專屬時光',
+    description: '這個母親節，不必出門也能把最熱騰騰的心意送到媽媽面前！Pizza Time 限定推出「母親節聯名套餐」，將澳門超人氣美味 PIZZA 直送香港，全家圍坐一桌，只為那一口熟悉的香氣與久違的陪伴。',
     category: '貼文設計',
     type: 'group',
     images: [
@@ -345,8 +345,8 @@ const works = [
   // 組合9 - 求婚策劃系列
   {
     id: 9,
-    title: '求婚策劃系列',
-    description: '完整的求婚策劃服務，從測驗到執行，為每對戀人打造專屬的浪漫回憶。',
+    title: 'Scene of Yes｜揭開專屬你的浪漫告白場景',
+    description: '每段愛情，都值得一場剛剛好的告白。是夕陽下的沙灘？熱氣球上的天空？還是滿地玫瑰的私密驚喜？為你和他／她的命定瞬間，打造最動人的開場白。',
     category: '貼文設計',
     type: 'group',
     images: [
@@ -358,8 +358,8 @@ const works = [
   // 組合10 - 健力痛症系列
   {
     id: 10,
-    title: '健力痛症系列',
-    description: '專業的痛症治療資訊系列，幫助大眾認識身體警訊，遠離不適。',
+    title: 'Trigger Point｜痛點背後的真相，你了解幾多？',
+    description: '每日肩膀痠痛、手臂舉唔高、甚至痛到連瞓覺都翻身困難？你以為係壓力太大，其實可能係「周肩炎」暗暗作怪。健力痛症治療中心透過專業治療，從筋膜釋放、關節鬆動到姿勢調整，幫你找出根源、對症舒緩，唔使再靠止痛藥硬撐！',
     category: '貼文設計',
     type: 'group',
     images: [
@@ -370,8 +370,8 @@ const works = [
   // 組合11 - 親Party 系列
   {
     id: 11,
-    title: '親Party 系列',
-    description: '一站式派對策劃服務，從諮詢到執行，為每個重要時刻創造難忘回憶。',
+    title: 'Party Talk｜準備好資料，Party就無難度！',
+    description: '「我想做布置呀～」這句話雖簡單，背後藏著好多選項需要確認！為咗幫你打造最完美的派對佈置，我哋準備咗「派對前小提醒」系列，跟住熊熊的指引，一齊為派對開啟完美第一步！',
     category: '貼文設計',
     type: 'group',
     images: [
