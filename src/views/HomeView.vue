@@ -177,23 +177,23 @@ const imageLoading = ref(false)
 const featuredWorks = [
   {
     id: 1,
-    title: 'MVP 設計作品 1',
-    description: '精選的設計作品，展現獨特的視覺美學與創意理念。',
-    category: '精選作品',
+    title: 'Nude Radiance｜裸感光采的極簡奢養',
+    description: '一瓶，為每一次素顏準備的高級底氣。來自法國 Raffiné 的專業級防護精華，集防曬、潤色、緊緻於一身，無須多層堆疊，即刻展現裸肌自帶濾鏡的光澤感。',
+    category: '貼文設計',
     image: new URL('../assets/images/mvp/組合3-1.png', import.meta.url).href
   },
   {
     id: 2,
-    title: 'MVP 設計作品 2',
-    description: '專業的視覺設計，傳達品牌價值與設計理念。',
+    title: 'Bright Precision｜打開透白新節奏',
+    description: '美白不再只是口號，從抗氧化、淡化暗沉到提升紅潤氣色，專利穀胱甘肽搭配膠原胜肽與多重亮白因子，4 週內自然透亮有感。。',
     category: '精選作品',
     image: new URL('../assets/images/mvp/組合4-4.png', import.meta.url).href
   },
   {
     id: 3,
-    title: 'MVP 設計作品 3',
-    description: '創意十足的設計作品，展現設計師的專業能力。',
-    category: '精選作品',
+    title: 'Slice of Love｜一口濃情，共享媽媽的專屬時光',
+    description: '這個母親節，不必出門也能把最熱騰騰的心意送到媽媽面前！Pizza Time 限定推出「母親節聯名套餐」，將澳門超人氣美味 PIZZA 直送香港，全家圍坐一桌，只為那一口熟悉的香氣與久違的陪伴。',
+    category: '貼文設計',
     image: new URL('../assets/images/mvp/work-25.png', import.meta.url).href
   },
 ]
