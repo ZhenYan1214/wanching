@@ -50,11 +50,25 @@
               <!-- Image -->
               <div class="relative w-full aspect-[4/3] overflow-hidden">
                 <img 
-                  :src="work.image" 
+                  :src="work.type === 'group' ? work.images[0] : work.image" 
                   :alt="work.title"
                   class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 group-hover:shadow-2xl"
                 />
                 <div class="absolute inset-0 pointer-events-none group-hover:bg-black/10 transition-colors duration-300"></div>
+                
+                <!-- Group indicator -->
+                <div v-if="work.type === 'group'" class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium text-gray-800 shadow-lg">
+                  {{ work.images.length }} 張
+                </div>
+                
+                <!-- Click hint overlay -->
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div class="bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg">
+                    <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
               <!-- Content -->
               <div class="flex flex-col flex-1 p-6 justify-between">
@@ -74,77 +88,122 @@
       </div>
     </section>
 
-    <!-- Image Preview Modal -->
-    <Transition
-      enter-active-class="transition duration-700 ease-out"
-      enter-from-class="transform opacity-0 scale-95"
-      enter-to-class="transform opacity-100 scale-100"
-      leave-active-class="transition duration-300 ease-in"
-      leave-from-class="transform opacity-100 scale-100"
-      leave-to-class="transform opacity-0 scale-95"
-    >
-      <div 
-        v-if="selectedWork" 
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-2xl"
-        @click.self="closePreview"
-        @keydown.esc="closePreview"
-      >
-        <!-- Background Particles -->
-        <div class="modal-background absolute inset-0 opacity-0">
-          <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAzNGM0LjQxOCAwIDgtMy41ODIgOC04cy0zLjU4Mi04LTgtOC04IDMuNTgyLTggOCAzLjU4MiA4IDggOHoiIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iLjAyIi8+PC9nPjwvc3ZnPg==')] opacity-5 animate-float"></div>
-        </div>
+         <!-- Professional Image Preview Modal -->
+     <Transition
+       enter-active-class="transition duration-500 ease-out"
+       enter-from-class="transform opacity-0 scale-95"
+       enter-to-class="transform opacity-100 scale-100"
+       leave-active-class="transition duration-300 ease-in"
+       leave-from-class="transform opacity-100 scale-100"
+       leave-to-class="transform opacity-0 scale-95"
+     >
+       <div 
+         v-if="selectedWork" 
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+         @click.self="closePreview"
+       >
+         <!-- Close Button -->
+         <button 
+           @click="closePreview"
+           class="close-button absolute top-6 right-6 z-50 p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-all duration-300 text-white"
+         >
+           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+           </svg>
+         </button>
 
-        <!-- Main Modal Card -->
-        <div 
-          ref="modalRef"
-          class="relative w-full max-w-[600px] bg-white/5 backdrop-blur-3xl rounded-3xl shadow-2xl p-8"
-          style="box-shadow: 0 0 0 1px rgba(255,255,255,0.1) inset, 0 8px 32px 0 rgba(0,0,0,0.2);"
-        >
-          <!-- Close Button -->
-          <button 
-            @click="closePreview"
-            class="fixed top-4 right-4 z-50 p-3 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all duration-300 transform hover:scale-110 hover:shadow-lg"
-          >
-            <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+         <!-- Zoom Controls -->
+         <div class="absolute top-6 left-6 z-50 flex gap-2">
+           <button 
+             @click="zoomIn"
+             class="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-all duration-300 text-white"
+             :disabled="currentZoom >= 3"
+           >
+             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+             </svg>
+           </button>
+           <button 
+             @click="zoomOut"
+             class="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-all duration-300 text-white"
+             :disabled="currentZoom <= 0.5"
+           >
+             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 13v3m0 0v3m0-3h3m-3 0H7" />
+             </svg>
+           </button>
+           <button 
+             @click="resetZoom"
+             class="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-all duration-300 text-white"
+           >
+             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+             </svg>
+           </button>
+         </div>
 
-          <!-- Image Container -->
-          <div 
-            ref="imageRef"
-            class="relative w-full aspect-[4/3] overflow-hidden rounded-2xl bg-gray-900/20 flex items-center justify-center mb-8"
-          >
-            <img 
-              :src="selectedWork.image" 
-              :alt="selectedWork.title"
-              class="w-full h-full object-contain p-8 drop-shadow-md"
-            />
-          </div>
+                             <!-- Image Container - Full Screen Focus -->
+         <div 
+           ref="imageContainer"
+           class="relative flex items-center justify-center w-full h-full p-4"
+         >
+           <img 
+             :src="selectedWork.type === 'group' ? selectedWork.images[currentImageIndex] : selectedWork.image" 
+             :alt="selectedWork.title"
+             ref="previewImage"
+             class="max-w-full max-h-full object-contain rounded-lg shadow-2xl transform-gpu"
+             @load="onImageLoad"
+           />
+           
+           <!-- Loading State -->
+           <div v-if="imageLoading" class="absolute inset-0 flex items-center justify-center">
+             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+           </div>
 
-          <!-- Divider -->
-          <div class="border-t border-white/10 mb-8"></div>
+           <!-- Navigation for group images -->
+           <div v-if="selectedWork.type === 'group' && selectedWork.images.length > 1" class="absolute inset-x-0 top-1/2 transform -translate-y-1/2 flex justify-between items-center px-4">
+             <!-- Previous button -->
+             <button 
+               @click="previousImage"
+               :disabled="currentImageIndex === 0"
+               class="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-all duration-300 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+             >
+               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+               </svg>
+             </button>
+             
+             <!-- Next button -->
+             <button 
+               @click="nextImage"
+               :disabled="currentImageIndex === selectedWork.images.length - 1"
+               class="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-all duration-300 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+             >
+               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+               </svg>
+             </button>
+           </div>
 
-          <!-- Work Info -->
-          <div 
-            ref="contentRef"
-            class="bg-white/10 backdrop-blur-md rounded-xl p-6 shadow-md"
-          >
-            <h2 class="text-2xl font-semibold tracking-wider mb-3 text-white">{{ selectedWork.title }}</h2>
-            <p class="text-base text-gray-300 leading-relaxed tracking-wide mb-4 line-clamp-3">{{ selectedWork.description }}</p>
-            <span class="text-xs px-3 py-1.5 bg-white/10 text-white/90 rounded-full inline-block">
-              {{ selectedWork.category }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </Transition>
+           <!-- Image counter for group -->
+           <div v-if="selectedWork.type === 'group' && selectedWork.images.length > 1" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full text-white text-sm">
+             {{ currentImageIndex + 1 }} / {{ selectedWork.images.length }}
+           </div>
+         </div>
+
+         <!-- Navigation Hints -->
+         <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-white/40 text-sm bg-black/30 backdrop-blur-sm px-3 py-1 rounded-full">
+           <p v-if="selectedWork.type === 'group'">ESC 關閉 | ← → 切換</p>
+           <p v-else>ESC 關閉</p>
+         </div>
+       </div>
+     </Transition>
   </main>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { onMounted } from 'vue'
+import { ref, computed, nextTick } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -153,241 +212,318 @@ gsap.registerPlugin(ScrollTrigger)
 const categories = ['All', '貼文設計', '印刷品', 'AI設計']
 const activeCategory = ref('All')
 const selectedWork = ref(null)
-const modalRef = ref(null)
-const imageRef = ref(null)
-const contentRef = ref(null)
+const imageContainer = ref(null)
+const previewImage = ref(null)
+const infoOverlay = ref(null)
+const imageLoading = ref(false)
+const currentZoom = ref(1)
+const currentImageIndex = ref(0)
 
 const works = [
+  // 組合1 - 貼文設計系列
   {
     id: 1,
-    title: 'Echoes of Distraction｜分心的回聲',
-    description: '以溫柔幽默描繪數位焦慮，喚醒專注與連結的價值。',
+    title: '組合1｜貼文設計系列',
+    description: '一系列精心設計的社群媒體貼文，展現品牌故事與視覺美學的完美結合。',
     category: '貼文設計',
-    image: new URL('../assets/images/works/work-2.png', import.meta.url).href
+    type: 'group',
+    images: [
+      new URL('../assets/images/works-com/組合1-1.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合1-2.png', import.meta.url).href
+    ]
   },
+  // 組合2 - 貼文設計系列
   {
     id: 2,
-    title: 'Swiped Away｜被滑走的專注力',
-    description: '在科技洪流中，專注力悄悄被滑走。以輕盈筆觸描繪現代人的日常焦慮，呈現數位世界下的情緒流動。',
+    title: '組合2｜貼文設計系列',
+    description: '創意十足的視覺設計，透過色彩與構圖傳達品牌理念。',
     category: '貼文設計',
-    image: new URL('../assets/images/works/work-4.png', import.meta.url).href
+    type: 'group',
+    images: [
+      new URL('../assets/images/works-com/組合2-1.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合2-2.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合2-3.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合2-4.png', import.meta.url).href
+    ]
   },
+  // 組合3 - 貼文設計系列
   {
     id: 3,
+    title: '組合3｜貼文設計系列',
+    description: '多元化的設計風格，從簡約到華麗，展現不同的視覺語言。',
+    category: '貼文設計',
+    type: 'group',
+    images: [
+      new URL('../assets/images/works-com/組合3-1.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合3-2.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合3-3.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合3-4.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合3-5.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合3-6.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合3-7.png', import.meta.url).href
+    ]
+  },
+  // 組合4 - 貼文設計系列
+  {
+    id: 4,
+    title: '組合4｜貼文設計系列',
+    description: '精心策劃的視覺系列，每個元素都經過深思熟慮的設計。',
+    category: '貼文設計',
+    type: 'group',
+    images: [
+      new URL('../assets/images/works-com/組合4-1.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合4-2.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合4-3.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合4-4.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合4-5.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合4-6.png', import.meta.url).href
+    ]
+  },
+  // 組合5 - 貼文設計系列
+  {
+    id: 5,
+    title: '組合5｜貼文設計系列',
+    description: '獨特的設計理念，創造令人印象深刻的視覺體驗。',
+    category: '貼文設計',
+    type: 'group',
+    images: [
+      new URL('../assets/images/works-com/組合5-1.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合5-2.png', import.meta.url).href
+    ]
+  },
+  // 組合6 - 貼文設計系列
+  {
+    id: 6,
+    title: '組合6｜貼文設計系列',
+    description: '完整的設計系列，展現從概念到執行的完整設計流程。',
+    category: '貼文設計',
+    type: 'group',
+    images: [
+      new URL('../assets/images/works-com/組合6-1.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合6-2.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合6-3.png', import.meta.url).href,
+      new URL('../assets/images/works-com/組合6-4.png', import.meta.url).href
+    ]
+  },
+  // 組合7 - 療癒系設計系列
+  {
+    id: 7,
+    title: '療癒系設計系列',
+    description: '一系列溫暖療癒的視覺設計，從分心回聲到療癒時光，展現溫柔的設計力量。',
+    category: '貼文設計',
+    type: 'group',
+    images: [
+      new URL('../assets/images/works/work-17.png', import.meta.url).href,
+      new URL('../assets/images/works/work-18.png', import.meta.url).href
+    ]
+  },
+  // 組合12 - 數位焦慮系列
+  {
+    id: 12,
+    title: '數位焦慮系列',
+    description: '以溫柔幽默描繪現代人的數位焦慮，喚醒專注與連結的價值。',
+    category: '貼文設計',
+    type: 'group',
+    images: [
+      new URL('../assets/images/works/work-4.png', import.meta.url).href,
+      new URL('../assets/images/works/work-2.png', import.meta.url).href
+    ]
+  },
+  // 組合8 - Pizza Time 系列
+  {
+    id: 8,
+    title: 'Pizza Time 系列',
+    description: '澳門人氣PIZZA品牌在香港的完整行銷系列，從母親節到開張慶典，展現品牌魅力。',
+    category: '貼文設計',
+    type: 'group',
+    images: [
+      new URL('../assets/images/works/work-25.png', import.meta.url).href,
+      new URL('../assets/images/works/work-26.png', import.meta.url).href,
+      new URL('../assets/images/works/work-27.png', import.meta.url).href
+    ]
+  },
+  // 組合9 - 求婚策劃系列
+  {
+    id: 9,
+    title: '求婚策劃系列',
+    description: '完整的求婚策劃服務，從測驗到執行，為每對戀人打造專屬的浪漫回憶。',
+    category: '貼文設計',
+    type: 'group',
+    images: [
+      new URL('../assets/images/works/work-30.png', import.meta.url).href,
+      new URL('../assets/images/works/work-31.png', import.meta.url).href,
+      new URL('../assets/images/works/work-32.png', import.meta.url).href
+    ]
+  },
+  // 組合10 - 健力痛症系列
+  {
+    id: 10,
+    title: '健力痛症系列',
+    description: '專業的痛症治療資訊系列，幫助大眾認識身體警訊，遠離不適。',
+    category: '貼文設計',
+    type: 'group',
+    images: [
+      new URL('../assets/images/works/work-33.png', import.meta.url).href,
+      new URL('../assets/images/works/work-34.png', import.meta.url).href
+    ]
+  },
+  // 組合11 - 親Party 系列
+  {
+    id: 11,
+    title: '親Party 系列',
+    description: '一站式派對策劃服務，從諮詢到執行，為每個重要時刻創造難忘回憶。',
+    category: '貼文設計',
+    type: 'group',
+    images: [
+      new URL('../assets/images/works/work-35.png', import.meta.url).href,
+      new URL('../assets/images/works/work-36.png', import.meta.url).href,
+      new URL('../assets/images/works/work-37.png', import.meta.url).href
+    ]
+  },
+  // 單張作品
+  {
+    id: 12,
     title: 'A Bite of Dreams｜一口夢境',
     description: '用柔和筆觸打造療癒系視覺，讓品牌在日常中悄悄盛開。',
     category: '印刷品',
+    type: 'single',
     image: new URL('../assets/images/works/work-3.png', import.meta.url).href
   },
   {
-    id: 4,
+    id: 13,
     title: 'The First Bite of Love｜初嚐戀愛的滋味',
     description: '熱情番茄、醇厚起司與新鮮羅勒，在炙熱爐火中共舞。每一口，都是經典瑪格麗特的純粹告白，為日常注入一抹溫柔而鮮明的悸動。',
     category: '貼文設計',
+    type: 'single',
     image: new URL('../assets/images/works/work-7.png', import.meta.url).href
   },
   {
-    id: 5,
+    id: 14,
     title: 'Whispers of an Apple｜蘋果的呢喃',
     description: '一顆蘋果，藏著無數溫柔的想像。以輕盈手繪描摹自然，賦予日常物件新的詩意生命。',
     category: '印刷品',
+    type: 'single',
     image: new URL('../assets/images/works/work-6.png', import.meta.url).href
   },
   {
-    id: 6,
+    id: 15,
     title: 'Gravityless Touch｜無重力的輕盈瞬間',
     description: '一拍貼合，宛如無重力般細緻服貼。輕盈粉體，將完美膚觸輕輕釋放，讓每一次上妝都如羽毛般無痕、自然綻放無瑕光采。',
     category: '貼文設計',
+    type: 'single',
     image: new URL('../assets/images/works/work-8.png', import.meta.url).href
   },
   {
-    id: 7,
+    id: 16,
     title: 'A Day of Privilege｜專屬禮遇之日',
     description: '在流光中，為摯愛品牌而來的日子。專屬會員禮遇，讓每一次選擇都值得被珍藏，限時珍貴，成就每一段不凡體驗。',
     category: '貼文設計',
+    type: 'single',
     image: new URL('../assets/images/works/work-9.png', import.meta.url).href
   },
   {
-    id: 8,
+    id: 17,
     title: 'A Picnic of Light｜輕盈午後的野餐夢',
     description: '在暖陽與微風中，甜點、笑聲與慵懶的片刻交織成畫。AI 筆觸下的小貓，戴著夏日微笑，在野餐墊上恣意伸展，喚醒每個人心中最柔軟的夏天。',
     category: 'AI設計',
+    type: 'single',
     image: new URL('../assets/images/works/work-10.png', import.meta.url).href
   },
   {
-    id: 9,
+    id: 18,
     title: 'Neon Pulse｜霓光脈搏的少女覺醒',
     description: '在電光閃耀的世界裡，她以無畏之姿喚醒未來。霓虹與速度交織成新生代的節奏，每一個目光，都映照著無限可能的冒險啟程。',
     category: 'AI設計',
+    type: 'single',
     image: new URL('../assets/images/works/work-11.jpg', import.meta.url).href
   },
   {
-    id: 10,
+    id: 19,
     title: 'Festive Whispers｜節慶裡的微笑邀請',
     description: '在日系紅燈籠與暖湯香氣中，拋飛飛鏢、分享一碗關東煮，用遊戲和味覺編織出最柔軟的相遇時光。每個笑聲，都讓冬日市集更加溫暖。',
     category: '印刷品',
+    type: 'single',
     image: new URL('../assets/images/works/work-12.png', import.meta.url).href
   },
   {
-    id: 11,
+    id: 20,
     title: 'Retro Reverie｜時光派對的倒數節奏',
     description: '揉合復古情懷與青春律動，倒數的每一天，都是記憶裡最鮮明的片段。透過視覺節奏串連倒數、抽獎與感謝，讓社群互動在懷舊與期待間悄悄升溫。',
     category: '貼文設計',
+    type: 'single',
     image: new URL('../assets/images/works/work-13.png', import.meta.url).href
   },
   {
-    id: 12,
+    id: 21,
     title: 'Retro Glitch｜嬉鬧復古的小宇宙',
     description: '以粗顆粒筆觸與鮮明配色，捕捉復古派對裡的狂歡記憶。每一枚貼紙，都是一段不羈的呢喃，讓歡笑與懷舊情緒，在指尖悄悄發酵。',
     category: '印刷品',
+    type: 'single',
     image: new URL('../assets/images/works/work-14.png', import.meta.url).href
   },
   {
-    id: 13,
+    id: 22,
     title: 'Moments to Collect｜時光裡的微醺印記',
     description: '以懷舊插畫搭配集點互動，將復古派對的溫度延伸至每一次舉杯、每一場笑語。設計讓參與者在集點中留下專屬於當晚的微醺記憶，凝結成獨一無二的節慶篇章。',
     category: '印刷品',
+    type: 'single',
     image: new URL('../assets/images/works/work-15.png', import.meta.url).href
   },
   {
-    id: 14,
+    id: 23,
     title: 'Journey to Tranquility｜一場身心放鬆的靜謐旅程',
     description: '在溫暖木色與日式圓窗間，展開一場與自己對話的旅程。每一寸細節，都是對身心溫柔的擁抱，讓心靈在靜謐中悄悄舒展。',
     category: '貼文設計',
+    type: 'single',
     image: new URL('../assets/images/works/work-16.png', import.meta.url).href
   },
   {
-    id: 15,
-    title: 'Artisans Touch｜指尖流轉的溫柔工藝',
-    description: '以職人精神雕琢每一寸肌理，從掌心至指尖，細膩地釋放壓力與疲憊。每一次觸感，都是對身體最真誠的聆聽與安撫。',
-    category: '貼文設計',
-    image: new URL('../assets/images/works/work-17.png', import.meta.url).href
-  },
-  {
-    id: 16,
-    title: 'Moments of Healing｜專屬於你的療癒時光',
-    description: '揉合傳統技藝與現代呵護，為每一次舒壓注入新意。從汗蒸溫熱到細膩按摩，層層堆疊出的，不只是放鬆，更是一場專屬於你的珍貴儀式。',
-    category: '貼文設計',
-    image: new URL('../assets/images/works/work-18.png', import.meta.url).href
-  },
-  {
-    id: 17,
+    id: 24,
     title: 'Prism Secrets｜小五星的秘密公式',
     description: '跳脫直覺陷阱，讓數學思考更有節奏感。以活潑圖解喚醒邏輯之美，將枯燥公式化為趣味冒險，為孩子打開通往數學小宇宙的大門。',
     category: '貼文設計',
+    type: 'single',
     image: new URL('../assets/images/works/work-19.png', import.meta.url).href
   },
   {
-    id: 18,
+    id: 25,
     title: 'Guidance for New Beginnings｜外傭面試的溫暖起點',
     description: '在輕鬆對談中，為未來共處的每一日奠定溫柔基礎。以專業與理解，協助彼此找到最適合的頻率，開啟一段相互成就的旅程。',
     category: '貼文設計',
+    type: 'single',
     image: new URL('../assets/images/works/work-21.png', import.meta.url).href
   },
   {
-    id: 19,
+    id: 26,
     title: 'Steps to Shine｜為夢想鋪路的特訓節奏',
     description: '精心設計的課程節奏，讓孩子們在步步踏實中找到自信的節拍。高效解題、重點突破，讓成績成為努力的最溫暖見證。',
     category: '貼文設計',
+    type: 'single',
     image: new URL('../assets/images/works/work-22.png', import.meta.url).href
   },
   {
-    id: 20,
+    id: 27,
     title: 'Harmony in Care｜僱傭關係的小小心意',
     description: '從理解與尊重出發，在溫暖的對話中建立信任。提前協議休息日與工作時間，讓每一段合作關係，都在心意交織中自然生長。',
     category: '貼文設計',
+    type: 'single',
     image: new URL('../assets/images/works/work-24.png', import.meta.url).href
   },
   {
-    id: 21,
-    title: "Pizza Time｜母親節專屬盛宴",
-    description: "以愛為名，邀你與媽媽共享最美味的時光。澳門人氣手作PIZZA，首度獻禮香港，經典雙拼口味，層層美味承載心意。母親節限定套票於foodpanda獨家七折，留住家的溫暖，留住媽媽的笑容。",
-    category: "貼文設計",
-    image: new URL('../assets/images/works/work-25.png', import.meta.url).href
-  },
-  {
-    id: 22,
-    title: "Pizza Time｜荃灣開張限定禮遇",
-    description: "全澳門人氣美味PIZZA，盛大登陸香港荃灣！開幕期間，獻上半價優惠，邀你搶先品嚐新鮮手作與濃郁起司的極致享受。專屬開店驚喜，只在荃灣門市限定，讓每一口都是開啟美好生活的起點。",
-    category: "貼文設計",
-    image: new URL('../assets/images/works/work-26.png', import.meta.url).href
-  },
-  {
-    id: 23,
-    title: "Pizza Time｜新張勁賞・荃灣限定",
-    description: "荃灣店盛大開張，人氣PIZZA超足料登場，限時享受5折勁賞！經典雙拼口味，給你滿滿誠意的歡樂分享時刻。錯過今次優惠，真係走寶！立即約親友一起來體驗極致美味。",
-    category: "貼文設計",
-    image: new URL('../assets/images/works/work-27.png', import.meta.url).href
-  },
-  {
-    id: 24,
+    id: 28,
     title: "安域僱傭｜專業配對・高效安心",
     description: "三日極速搵人，成功率高達90%。專人貼心配對，快速上工，精準無走漏。安域僱傭以專業與誠信，助你輕鬆找到最合適的姐姐，讓家中每一刻都更溫暖、更安心。",
     category: "貼文設計",
+    type: 'single',
     image: new URL('../assets/images/works/work-28.png', import.meta.url).href
   },
   {
-    id: 25,
+    id: 29,
     title: "安域僱傭｜外傭工作範圍須知",
     description: "姐姐服務範圍明確，按摩不屬於標準工作內容。若因照顧需求需幫忙推拿，必須事前獲得外傭同意。強迫或暗示按摩屬違法行為，請尊重雙方權益，守法共創安心僱傭關係。",
     category: "貼文設計",
+    type: 'single',
     image: new URL('../assets/images/works/work-29.png', import.meta.url).href
-  },
-  {
-    id: 26,
-    title: "浪漫求婚場地測驗｜揀出你專屬的愛情場景",
-    description: "用一場小測驗，探索屬於你的夢幻求婚場地。從細膩情感到浪漫氛圍，量身推薦最適合你與摯愛的告白場景，讓每一個重要時刻都值得被珍藏。",
-    category: "貼文設計",
-    image: new URL('../assets/images/works/work-30.png', import.meta.url).href
-  },
-  {
-    id: 27,
-    title: "求婚小測驗｜你夢想中的求婚氛圍？",
-    description: "第一題｜私密浪漫、熱鬧開心、自然清新或打卡無敵景？四大主題氛圍，讓你輕鬆揀選最動心的告白方式，量身打造屬於你的愛情儀式感。",
-    category: "貼文設計",
-    image: new URL('../assets/images/works/work-31.png', import.meta.url).href
-  },
-  {
-    id: 28,
-    title: "Cherish in Love｜打造屬於你的完美求婚",
-    description: "完成小測驗後，留言答案或私訊我們，立即為你規劃專屬浪漫方案。Cherish in Love 專業團隊，陪你實現一生一次的美好回憶，讓愛情故事閃耀每個細節。",
-    category: "貼文設計",
-    image: new URL('../assets/images/works/work-32.png', import.meta.url).href
-  },
-  {
-    id: 29,
-    title: "健力痛症話你知｜肩頸痛背後的真相",
-    description: "肩頭痛到郁唔到？小心是周肩炎作怪！健力痛症治療中心專業解析，幫你認識身體警訊，找出痛症根源，遠離不適，重拾健康活力。",
-    category: "貼文設計",
-    image: new URL('../assets/images/works/work-33.png', import.meta.url).href
-  },
-  {
-    id: 30,
-    title: "健力痛症話你知｜姿勢習慣與肩頸痛",
-    description: "姿勢差、少運動，肩周炎易發作！長期抬重、吹冷氣、肩膀僵硬甚至無法舉手，都可能是『凍結肩』警訊。貼膏藥、吃止痛藥只能治標，真正改善要從根本做起。即刻關注你的健康，舒緩肩頭筋腱，擺脫困擾每一天！",
-    category: "貼文設計",
-    image: new URL('../assets/images/works/work-34.png', import.meta.url).href
-  },
-  {
-    id: 31,
-    title: "親Party諮詢小提醒｜問得啱先有得諗！",
-    description: "規劃派對裝飾前，記得先準備好主題、年齡、場地等資訊。溝通順暢，活動才更貼心完美！親Party用心陪你打造每一場溫馨回憶。",
-    category: "貼文設計",
-    image: new URL('../assets/images/works/work-35.png', import.meta.url).href
-  },
-  {
-    id: 32,
-    title: "親Party佈置元素｜主題規劃全攻略",
-    description: "想要氣球、主題背景、甜品枱或各種拍照小物？親Party貼心提醒你，規劃活動前先列出所有需求，讓每個元素都能完美呈現，打造專屬你的難忘回憶派對。",
-    category: "貼文設計",
-    image: new URL('../assets/images/works/work-36.png', import.meta.url).href
-  },
-  {
-    id: 33,
-    title: "親Party服務項目｜一站式活動設計",
-    description: "百日宴、生日會、性別揭曉、壽宴祝賀、公司及學校活動，全方位專業規劃。歡迎聯絡我們，免費諮詢，讓每一場慶典都更獨特、更貼心。",
-    category: "貼文設計",
-    image: new URL('../assets/images/works/work-37.png', import.meta.url).href
   }
 ]
 
@@ -403,15 +539,38 @@ onMounted(() => {
     gsap.from(card, {
       opacity: 0,
       y: 30,
-      duration: 0.4, // Reduced duration
-      delay: i * 0.05, // Reduced delay
+      duration: 0.4,
+      delay: i * 0.05,
       scrollTrigger: {
         trigger: card,
         start: 'top 80%',
         end: 'top 20%',
-        toggleActions: 'play none none none' // Changed to only play once
+        toggleActions: 'play none none none'
       }
     })
+  })
+  
+  // Add keyboard event listener
+  const handleKeydown = (e) => {
+    if (e.key === 'Escape' && selectedWork.value) {
+      closePreview()
+    }
+    
+    // Navigation for group images
+    if (selectedWork.value && selectedWork.value.type === 'group') {
+      if (e.key === 'ArrowRight') {
+        nextImage()
+      } else if (e.key === 'ArrowLeft') {
+        previousImage()
+      }
+    }
+  }
+  
+  document.addEventListener('keydown', handleKeydown)
+  
+  // Cleanup on unmount
+  onUnmounted(() => {
+    document.removeEventListener('keydown', handleKeydown)
   })
 })
 
@@ -420,42 +579,109 @@ const isLoading = ref(false)
 
 const openPreview = (work) => {
   selectedWork.value = work
+  currentImageIndex.value = 0
+  imageLoading.value = true
   document.body.style.overflow = 'hidden'
   
-  // Preload image
+  // Preload image for better performance
   const img = new Image()
+  img.onload = () => {
+    imageLoading.value = false
+    
+    // Smart sizing based on image dimensions
+    const aspectRatio = img.width / img.height
+    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight
+    
+    // Calculate optimal display size
+    let maxWidth, maxHeight
+    
+    if (aspectRatio > 1) {
+      // Landscape images
+      maxWidth = Math.min(viewportWidth * 0.9, img.width)
+      maxHeight = Math.min(viewportHeight * 0.8, img.height)
+    } else {
+      // Portrait images (like 4:5 IG posts)
+      maxWidth = Math.min(viewportWidth * 0.8, img.width)
+      maxHeight = Math.min(viewportHeight * 0.9, img.height)
+    }
+    
+    // Apply optimal sizing
+    if (previewImage.value) {
+      previewImage.value.style.maxWidth = `${maxWidth}px`
+      previewImage.value.style.maxHeight = `${maxHeight}px`
+    }
+  }
   img.src = work.image
   
-  // Animate background first
-  gsap.fromTo('.modal-background', 
-    { opacity: 0 },
-    { opacity: 1, duration: 0.2 } // Reduced duration
-  )
-  
-  // Then animate modal
-  gsap.fromTo(modalRef.value,
-    { opacity: 0, scale: 0.95 },
-    { opacity: 1, scale: 1, duration: 0.4, ease: 'power2.out' } // Reduced duration
-  )
-  
-  // Finally animate content
-  gsap.fromTo(contentRef.value,
-    { opacity: 0 },
-    { opacity: 1, duration: 0.3, delay: 0.1 } // Reduced duration and delay
-  )
-  
-  // Start image breathing animation
-  gsap.to(imageRef.value, {
-    scale: 1.02,
-    duration: 4, // Reduced duration
-    repeat: -1,
-    yoyo: true,
-    ease: 'sine.inOut'
+  // Smooth entrance animation
+  nextTick(() => {
+    if (imageContainer.value) {
+      gsap.fromTo(imageContainer.value,
+        { opacity: 0, scale: 0.95 },
+        { opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out' }
+      )
+    }
   })
+}
+
+const onImageLoad = () => {
+  imageLoading.value = false
+}
+
+const zoomIn = () => {
+  if (currentZoom.value < 3) {
+    currentZoom.value = Math.min(3, currentZoom.value + 0.25)
+    applyZoom()
+  }
+}
+
+const zoomOut = () => {
+  if (currentZoom.value > 0.5) {
+    currentZoom.value = Math.max(0.5, currentZoom.value - 0.25)
+    applyZoom()
+  }
+}
+
+const resetZoom = () => {
+  currentZoom.value = 1
+  applyZoom()
+}
+
+const applyZoom = () => {
+  if (previewImage.value) {
+    gsap.to(previewImage.value, {
+      scale: currentZoom.value,
+      duration: 0.3,
+      ease: 'power2.out'
+    })
+  }
+}
+
+const nextImage = () => {
+  if (selectedWork.value && selectedWork.value.type === 'group') {
+    if (currentImageIndex.value < selectedWork.value.images.length - 1) {
+      currentImageIndex.value++
+      imageLoading.value = true
+      resetZoom()
+    }
+  }
+}
+
+const previousImage = () => {
+  if (selectedWork.value && selectedWork.value.type === 'group') {
+    if (currentImageIndex.value > 0) {
+      currentImageIndex.value--
+      imageLoading.value = true
+      resetZoom()
+    }
+  }
 }
 
 const closePreview = () => {
   selectedWork.value = null
+  currentZoom.value = 1
+  currentImageIndex.value = 0
   document.body.style.overflow = 'auto'
 }
 </script>
@@ -496,5 +722,50 @@ const closePreview = () => {
   50% {
     transform: translate(10px, 10px);
   }
+}
+
+/* Professional image preview styles */
+.image-preview-container {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Smooth transitions for all interactive elements */
+.image-preview-container * {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover effects for close button */
+.close-button:hover {
+  transform: scale(1.1);
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive text sizing */
+@media (max-width: 640px) {
+  .preview-title {
+    font-size: 1.5rem;
+  }
+  .preview-description {
+    font-size: 0.875rem;
+  }
+}
+
+/* Full screen image focus */
+.image-preview-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Loading animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 </style> 

@@ -118,47 +118,42 @@
           <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAzNGM0LjQxOCAwIDgtMy41ODIgOC04cy0zLjU4Mi04LTgtOC04IDMuNTgyLTggOCAzLjU4MiA4IDggOHoiIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iLjAyIi8+PC9nPjwvc3ZnPg==')] opacity-5 animate-float"></div>
         </div>
 
-        <!-- Main Modal Card -->
+        <!-- Professional Image Preview Modal -->
         <div 
           ref="modalRef"
-          class="relative w-full max-w-[600px] bg-white/5 backdrop-blur-3xl rounded-3xl shadow-2xl p-8"
-          style="box-shadow: 0 0 0 1px rgba(255,255,255,0.1) inset, 0 8px 32px 0 rgba(0,0,0,0.2);"
+          class="relative w-full max-w-[95vw] max-h-[95vh] bg-black/80 backdrop-blur-3xl rounded-3xl shadow-2xl overflow-hidden"
         >
           <!-- Close Button -->
           <button 
             @click="closeWorkDetail"
-            class="fixed top-4 right-4 z-50 p-3 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all duration-300 transform hover:scale-110 hover:shadow-lg"
+            class="absolute top-6 right-6 z-50 p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-all duration-300 text-white"
           >
-            <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
 
-          <!-- Image Container -->
+          <!-- Image Container with Smart Sizing -->
           <div 
             ref="imageRef"
-            class="relative w-full aspect-[4/3] overflow-hidden rounded-2xl bg-gray-900/20 flex items-center justify-center mb-8"
+            class="relative max-w-[95vw] max-h-[95vh] flex items-center justify-center p-4"
           >
             <img 
               :src="selectedWork.image" 
               :alt="selectedWork.title"
-              class="w-full h-full object-contain p-8 drop-shadow-md"
+              class="max-w-full max-h-full object-contain rounded-lg shadow-2xl transform-gpu"
+              @load="onImageLoad"
             />
+            
+            <!-- Loading State -->
+            <div v-if="imageLoading" class="absolute inset-0 flex items-center justify-center">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+            </div>
           </div>
 
-          <!-- Divider -->
-          <div class="border-t border-white/10 mb-8"></div>
-
-          <!-- Work Info -->
-          <div 
-            ref="contentRef"
-            class="bg-white/10 backdrop-blur-md rounded-xl p-6 shadow-md"
-          >
-            <h2 class="text-2xl font-semibold tracking-wider mb-3 text-white">{{ selectedWork.title }}</h2>
-            <p class="text-base text-gray-300 leading-relaxed tracking-wide mb-4 line-clamp-3">{{ selectedWork.description }}</p>
-            <span class="text-xs px-3 py-1.5 bg-white/10 text-white/90 rounded-full inline-block">
-              {{ selectedWork.category }}
-            </span>
+          <!-- Navigation Hints -->
+          <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-white/40 text-sm bg-black/30 backdrop-blur-sm px-3 py-1 rounded-full">
+            <p>ESC 關閉</p>
           </div>
         </div>
       </div>
@@ -167,7 +162,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -177,69 +172,104 @@ const selectedWork = ref(null)
 const heroSection = ref(null)
 const modalRef = ref(null)
 const imageRef = ref(null)
-const contentRef = ref(null)
+const imageLoading = ref(false)
 
 const featuredWorks = [
   {
     id: 1,
-    title: 'Gravityless Touch｜無重力的輕盈瞬間',
-    description: '一拍貼合，宛如無重力般細緻服貼。輕盈粉體，將完美膚觸輕輕釋放，讓每一次上妝都如羽毛般無痕、自然綻放無瑕光采。',
-    category: '貼文設計',
-    image: new URL('../assets/images/works/work-8.png', import.meta.url).href
+    title: 'MVP 設計作品 1',
+    description: '精選的設計作品，展現獨特的視覺美學與創意理念。',
+    category: '精選作品',
+    image: new URL('../assets/images/mvp/組合3-1.png', import.meta.url).href
   },
   {
     id: 2,
-    title: '電商視覺設計',
-    description: '以視覺說服，用美感引導消費，精準提升品牌力與轉換率。',
-    category: '貼文設計',
-    image: new URL('../assets/images/works/work-2.png', import.meta.url).href,
-    link: '#'
+    title: 'MVP 設計作品 2',
+    description: '專業的視覺設計，傳達品牌價值與設計理念。',
+    category: '精選作品',
+    image: new URL('../assets/images/mvp/組合4-4.png', import.meta.url).href
   },
   {
-    id: 15,
-    title: 'Artisan’s Touch｜指尖流轉的溫柔工藝',
-    description: '以職人精神雕琢每一寸肌理，從掌心至指尖，細膩地釋放壓力與疲憊。每一次觸感，都是對身體最真誠的聆聽與安撫。',
-    category: '貼文設計',
-    image: new URL('../assets/images/works/work-17.png', import.meta.url).href
+    id: 3,
+    title: 'MVP 設計作品 3',
+    description: '創意十足的設計作品，展現設計師的專業能力。',
+    category: '精選作品',
+    image: new URL('../assets/images/mvp/work-25.png', import.meta.url).href
   },
 ]
 
 const openWorkDetail = (work) => {
   selectedWork.value = work
+  imageLoading.value = true
   document.body.style.overflow = 'hidden'
   
-  // Animate background first
-  gsap.fromTo('.modal-background', 
-    { opacity: 0 },
-    { opacity: 1, duration: 0.3 }
-  )
+  // Preload image for better performance
+  const img = new Image()
+  img.onload = () => {
+    imageLoading.value = false
+    
+    // Smart sizing based on image dimensions
+    const aspectRatio = img.width / img.height
+    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight
+    
+    // Calculate optimal display size
+    let maxWidth, maxHeight
+    
+    if (aspectRatio > 1) {
+      // Landscape images
+      maxWidth = Math.min(viewportWidth * 0.9, img.width)
+      maxHeight = Math.min(viewportHeight * 0.8, img.height)
+    } else {
+      // Portrait images (like 4:5 IG posts)
+      maxWidth = Math.min(viewportWidth * 0.8, img.width)
+      maxHeight = Math.min(viewportHeight * 0.9, img.height)
+    }
+    
+    // Apply optimal sizing
+    if (imageRef.value) {
+      const imgElement = imageRef.value.querySelector('img')
+      if (imgElement) {
+        imgElement.style.maxWidth = `${maxWidth}px`
+        imgElement.style.maxHeight = `${maxHeight}px`
+      }
+    }
+  }
+  img.src = work.image
   
-  // Then animate modal
-  gsap.fromTo(modalRef.value,
-    { opacity: 0, scale: 0.95 },
-    { opacity: 1, scale: 1, duration: 0.7, ease: 'power2.out' }
-  )
-  
-  // Finally animate content
-  gsap.fromTo(contentRef.value,
-    { opacity: 0 },
-    { opacity: 1, duration: 0.5, delay: 0.2 }
-  )
-  
-  // Start image breathing animation
-  gsap.to(imageRef.value, {
-    scale: 1.02,
-    duration: 5,
-    repeat: -1,
-    yoyo: true,
-    ease: 'sine.inOut'
+  // Smooth entrance animation
+  nextTick(() => {
+    if (modalRef.value) {
+      gsap.fromTo(modalRef.value,
+        { opacity: 0, scale: 0.95 },
+        { opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out' }
+      )
+    }
   })
+}
+
+const onImageLoad = () => {
+  imageLoading.value = false
 }
 
 const closeWorkDetail = () => {
   selectedWork.value = null
   document.body.style.overflow = 'auto'
 }
+
+// Add keyboard event listener
+const handleKeydown = (e) => {
+  if (e.key === 'Escape' && selectedWork.value) {
+    closeWorkDetail()
+  }
+}
+
+document.addEventListener('keydown', handleKeydown)
+
+// Cleanup on unmount
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
+})
 
 onMounted(() => {
   // Hero section scroll animation
@@ -295,5 +325,16 @@ onMounted(() => {
   50% {
     transform: translate(10px, 10px);
   }
+}
+
+/* Loading animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 </style> 
